@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # MySQL 数据库
+  mysql:
+    image: mysql:8.0
+    container_name: customer-manager-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: customer_manager
+      MYSQL_USER: cm_user
+      MYSQL_PASSWORD: cm_password
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - customer-manager-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Flask 应用
+  app:
+    build: .
+    container_name: customer-manager-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    environment:
+      - FLASK_APP=main.py
+      - DATABASE_TYPE=mysql
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=cm_user
+      - MYSQL_PASSWORD=cm_password
+      - MYSQL_DATABASE=customer_manager
+      - LOG_LEVEL=INFO
+    networks:
+      - customer-manager-network
+    restart: unless-stopped
+
+  # phpMyAdmin 数据库管理工具
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: customer-manager-phpmyadmin
+    depends_on:
+      - mysql
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root_password
+    networks:
+      - customer-manager-network
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  customer-manager-network:
+    driver: bridge
