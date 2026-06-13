@@ -1,10 +1,15 @@
-"""数据库基类 - 抽象接口"""
+"""
+数据库基类 - 抽象接口
+"""
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from datetime import datetime
 
 class DatabaseBase(ABC):
-    """数据库基类，定义通用接口"""
+    """
+    数据库基类，定义通用接口
+    所有具体数据库实现（Excel、MySQL）都继承此类
+    """
     
     @abstractmethod
     def init_db(self) -> bool:
@@ -25,7 +30,7 @@ class DatabaseBase(ABC):
         pass
     
     @abstractmethod
-    def get_all_customers(self, page: int = 1, per_page: int = 20) -> tuple:
+    def get_all_customers(self, page: int = 1, per_page: int = 20) -> Tuple[List[Dict[str, Any]], int]:
         """获取所有客户，返回 (客户列表, 总数)"""
         pass
     
