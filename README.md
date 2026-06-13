@@ -68,7 +68,7 @@ docker run -p 5000:5000 -v $(pwd)/data:/app/data customer-manager:latest
 ### 方式三: Docker Compose 运行（完整栈 - Excel）
 
 ```bash
-docker-compose up -d
+docker compose -f docker-compose.yml up -d
 ```
 
 访问: http://localhost:5000
@@ -77,7 +77,7 @@ docker-compose up -d
 
 ```bash
 # 使用 MySQL 配置
-docker-compose -f docker-compose.mysql.yml up -d
+docker compose -f docker-compose.mysql.yml up -d
 ```
 
 这将启动：
