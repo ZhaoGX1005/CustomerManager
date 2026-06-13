@@ -16,6 +16,8 @@ services:
       - DATABASE_TYPE=excel
       - EXCEL_DATA_PATH=./data/customers.xlsx
       - LOG_LEVEL=INFO
+      # 告诉 Python 导包时把 /app 目录（即项目根目录）作为主模块路径
+      - PYTHONPATH=/app
     networks:
       - customer-manager-network
     restart: unless-stopped
